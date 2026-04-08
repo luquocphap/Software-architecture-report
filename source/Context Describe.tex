@@ -1,0 +1,77 @@
+\section{Bối cảnh hệ thống Intelligent Restaurant Management System}
+
+\subsection{Giới thiệu và mục tiêu}
+Hệ thống IRMS (Intelligent Restaurant Management System) được đặc tả như một ứng dụng phần mềm nhằm tối ưu hóa và tự động hóa các hoạt động vận hành cốt lõi trong môi trường nhà hàng. Thông qua các giao diện số, cơ sở dữ liệu dùng chung và cơ chế điều phối dựa trên logic phần mềm, các quy trình như duyệt thực đơn, tiếp nhận và xử lý đơn hàng, quản lý trạng thái bàn, cập nhật tồn kho, cũng như tổng hợp dữ liệu vận hành được hỗ trợ một cách nhất quán. Trên cơ sở đó, sự tương tác giữa khối phục vụ (front-of-house), khối bếp (back-of-house) và bộ phận quản lý được đồng bộ hóa nhằm giảm thiểu sai lệch thông tin, hạn chế độ trễ trong luồng xử lý đơn hàng và cải thiện tính dự đoán của thời gian phục vụ.
+
+Mục tiêu kỹ thuật của hệ thống được đặt ra bao gồm: (i) chuẩn hóa quy trình tiếp nhận đơn hàng và truyền đạt yêu cầu chế biến, (ii) tăng cường khả năng phối hợp giữa các trạm chế biến thông qua cơ chế định tuyến và ưu tiên công việc, (iii) nâng cao năng lực giám sát trạng thái phục vụ tại bàn và trạng thái thanh toán, và (iv) cung cấp các công cụ phân tích phục vụ ra quyết định quản trị dựa trên dữ liệu. Hệ thống được định hướng để thích ứng với các điều kiện phục vụ biến động (giờ cao điểm, đơn hàng số lượng lớn) bằng cách hỗ trợ điều chỉnh luồng công việc nhằm hạn chế tắc nghẽn và giảm thiểu lỗi tác nghiệp.
+
+\subsection{Phạm vi hệ thống và các phân hệ chức năng}
+Phạm vi của IRMS được giới hạn trong các chức năng vận hành chính của nhà hàng, trong đó các phân hệ sau được xem là cấu phần trọng yếu.
+
+\subsubsection{Đặt món số và quản lý thực đơn}
+Quá trình đặt món được hỗ trợ thông qua thiết bị đầu cuối (tablet/terminal), nhờ đó việc ghi nhận đơn hàng được thực hiện nhanh chóng và có cấu trúc. Thực đơn được cho phép cập nhật theo thời gian thực, bao gồm thay đổi giá, cấu hình khuyến mãi và đánh dấu món không khả dụng. Đơn hàng được biểu diễn với khả năng mang theo các ràng buộc và tham số tùy biến, bao gồm ghi chú dị ứng, yêu cầu đặc biệt, lựa chọn theo combo, cũng như các cấu hình biến thể (kích cỡ, topping, mức chín). Nhằm mục đích đảm bảo tính toàn vẹn thông tin đầu vào, các tùy chọn này được xem như một phần dữ liệu bắt buộc phải được truyền đến khối bếp trong toàn bộ vòng đời xử lý đơn hàng.
+
+\subsubsection{Hiển thị đơn bếp và điều phối luồng chế biến}
+Đơn hàng sau khi được ghi nhận được định tuyến tự động đến hệ thống hiển thị bếp (KDS -- Kitchen Display System). Tại đây, các đơn được tổ chức theo tiêu chí thời gian chuẩn bị, nhóm món và trạm chế biến (ví dụ: grill, fryer, dessert) nhằm giảm thiểu xung đột tài nguyên và hỗ trợ phân công tác vụ. Hơn nữa, các cơ chế cảnh báo trực quan được sử dụng để thông báo sự kiện đơn hàng mới và nhận diện nguy cơ trễ hạn theo ngưỡng thời gian mục tiêu. Trạng thái xử lý món được cho phép cập nhật theo các mốc tiến độ (\texttt{Started} $\rightarrow$ \texttt{Cooking} $\rightarrow$ \texttt{Ready to Serve}), qua đó tạo tiền đề cho việc đồng bộ hóa thông tin phục vụ và giảm độ trễ trong việc giao món.
+
+\subsubsection{Quản lý bàn và đặt chỗ}
+Việc quản lý bàn được hỗ trợ trên sơ đồ số, trong đó trạng thái bàn (trống/đang sử dụng/đang dọn/đã đặt trước) được biểu diễn nhằm tối ưu hóa quy trình sắp xếp chỗ ngồi. Thời gian chờ dự kiến có thể được ước tính dựa trên dữ liệu lịch sử kết hợp trạng thái hiện tại của bàn và bếp. Mô-đun đặt chỗ được thiết kế để tiếp nhận đặt bàn theo lịch, xử lý danh sách chờ (waitlist) trong trường hợp vượt công suất, và hỗ trợ gửi thông báo cho khách theo kênh phù hợp với triển khai.
+
+\subsubsection{Tính tiền, thanh toán và xuất hóa đơn}
+Phân hệ thanh toán được thiết kế để hợp nhất các thành phần chi phí bao gồm món ăn, đồ uống, phí dịch vụ, khuyến mãi và thuế (tùy theo quy định áp dụng). Nhiều phương thức thanh toán được hỗ trợ, bao gồm tiền mặt, thẻ và ví điện tử. Ngoài ra, các cơ chế nghiệp vụ như tách hóa đơn theo khách/món và quản lý tiền tip được cung cấp nhằm phù hợp với bối cảnh vận hành thực tế. Đối với các thao tác nhạy cảm như hoàn/huỷ thanh toán, kiểm soát theo vai trò và ghi nhận nhật ký (audit log) được xem là yêu cầu bắt buộc nhằm đảm bảo khả năng truy vết.
+
+\subsubsection{Giám sát tồn kho}
+Theo phạm vi được nêu, mức tiêu hao nguyên liệu được cập nhật thủ công sau các giai đoạn sơ chế hoặc phục vụ. Trên cơ sở đó, cảnh báo được kích hoạt khi tồn kho giảm xuống dưới ngưỡng định trước nhằm hỗ trợ ra quyết định bổ sung. Dữ liệu tiêu hao lịch sử được duy trì để phục vụ phân tích xu hướng sử dụng và hỗ trợ ước lượng nhu cầu tái đặt hàng, qua đó góp phần hạn chế thiếu hụt và lãng phí.
+
+\subsubsection{Phân tích và báo cáo}
+Các báo cáo bán hàng được tạo lập nhằm phản ánh giờ cao điểm, món bán chạy và hiệu năng doanh thu theo các khoảng thời gian (ngày/tuần/tháng). Ngược lại, các chỉ số vận hành được tổng hợp để nhận diện chậm trễ, vị trí tắc nghẽn tại bếp và hiệu suất của nhân sự theo vai trò. Dữ liệu báo cáo được hỗ trợ xuất ra nhằm phục vụ các mục tiêu kế toán, hoạch định và đánh giá hiệu năng.
+
+\subsubsection{Công cụ quản trị}
+Các cơ chế quản trị được triển khai thông qua kiểm soát truy cập theo vai trò (RBAC -- Role-Based Access Control), qua đó quyền hạn được phân tách cho quản lý, phục vụ, bếp và thu ngân. Việc cấu hình thực đơn, cập nhật giá và chiến dịch khuyến mãi được tập trung hóa để giảm sai khác cấu hình giữa các điểm vận hành. Hệ thống nhật ký kiểm toán được duy trì để ghi nhận các hành vi quan trọng (ví dụ: hoàn tiền, huỷ đơn), nhằm cung cấp khả năng kiểm tra hậu nghiệm và hỗ trợ tuân thủ quy trình.
+
+\subsection{Tác nhân và tương tác vận hành điển hình}
+Các tác nhân chính được xác định bao gồm khách hàng, host, nhân viên phục vụ, nhân sự bếp, thu ngân và quản lý. Một luồng vận hành điển hình được mô tả như sau: (i) trạng thái bàn và phiên phục vụ được khởi tạo khi khách được sắp xếp chỗ, (ii) đơn hàng được ghi nhận và định tuyến đến KDS để tổ chức chế biến theo trạm, (iii) trạng thái món được cập nhật liên tục để hỗ trợ phục vụ, (iv) hóa đơn được chốt và thanh toán được xử lý, và (v) dữ liệu tồn kho và dữ liệu phân tích được cập nhật nhằm phục vụ giám sát vận hành.
+
+\subsection{Yêu cầu chức năng}
+Các yêu cầu chức năng cốt lõi của IRMS được tổng hợp như sau:
+\begin{enumerate}
+  \item \textbf{Quản lý thực đơn:} cho phép tạo/cập nhật/xóa (CRUD) món, cập nhật giá và đánh dấu món không khả dụng theo thời gian thực.
+  \item \textbf{Quản lý đơn hàng:} cho phép tạo đơn theo bàn; thêm/xóa món; ghi nhận tùy biến và ghi chú; theo dõi trạng thái của đơn và từng món.
+  \item \textbf{Điều phối bếp/KDS:} hỗ trợ định tuyến theo trạm; tổ chức hàng đợi theo thời gian và nhóm món; cung cấp cảnh báo theo ngưỡng thời gian.
+  \item \textbf{Quản lý bàn và đặt chỗ:} theo dõi trạng thái bàn; ước tính thời gian chờ; quản lý reservation và waitlist.
+  \item \textbf{Thanh toán và hóa đơn:} tổng hợp chi phí; hỗ trợ đa phương thức thanh toán; hỗ trợ tách hóa đơn và quản lý tip; xuất hóa đơn.
+  \item \textbf{Tồn kho:} cập nhật tiêu hao thủ công; cảnh báo thiếu; lưu trữ lịch sử tiêu hao.
+  \item \textbf{Phân tích và báo cáo:} tạo báo cáo doanh thu, giờ cao điểm, món bán chạy; phân tích chậm trễ và tắc nghẽn vận hành; hỗ trợ xuất dữ liệu.
+  \item \textbf{Quản trị và bảo mật:} triển khai RBAC; duy trì audit log cho các hành vi nhạy cảm.
+\end{enumerate}
+
+\subsection{Yêu cầu phi chức năng}
+Các yêu cầu phi chức năng được xem là tiêu chí thành công của hệ thống bao gồm:
+\begin{itemize}
+  \item \textbf{Hiệu năng và độ trễ:} thời gian phản hồi cho thao tác đặt món và truyền đơn đến bếp được yêu cầu nhỏ nhằm đáp ứng điều kiện giờ cao điểm.
+  \item \textbf{Độ tin cậy và tính sẵn sàng:} hệ thống được yêu cầu vận hành ổn định trong ca làm việc và hạn chế gián đoạn dịch vụ.
+  \item \textbf{Tính nhất quán dữ liệu:} trạng thái đơn hàng, bàn và thanh toán được yêu cầu đồng bộ giữa front-of-house và back-of-house.
+  \item \textbf{Tính khả mở:} khả năng mở rộng theo số lượng bàn, thiết bị và (trong định hướng dài hạn) theo nhiều cơ sở vận hành.
+  \item \textbf{Bảo mật:} phân quyền chặt chẽ đối với các thao tác nhạy cảm; nhật ký kiểm toán được duy trì để truy vết.
+  \item \textbf{Khả năng bảo trì:} thay đổi thực đơn, quy tắc khuyến mãi và luồng điều phối bếp được yêu cầu thực hiện với tác động tối thiểu lên các mô-đun còn lại.
+  \item \textbf{Khả năng quan sát:} log và chỉ số vận hành được yêu cầu để hỗ trợ phát hiện lỗi và nhận diện điểm nghẽn.
+  \item \textbf{Tính khả dụng (usability):} giao diện thao tác được yêu cầu tối giản nhằm phù hợp với bối cảnh vận hành có cường độ cao.
+\end{itemize}
+
+\subsection{Ràng buộc và giả định}
+Trong phạm vi bài toán được mô tả, các ràng buộc và giả định sau được áp dụng:
+\begin{itemize}
+  \item Dữ liệu tiêu hao tồn kho được cập nhật thủ công; cơ chế tự động trừ kho nâng cao không được xem là bắt buộc trong phạm vi hiện tại.
+  \item Cơ chế thông báo khách (SMS/email) được xem như khả năng tích hợp theo mức độ triển khai.
+  \item Luồng xử lý đặt món--điều phối bếp--thanh toán được xem là trục nghiệp vụ chính; các năng lực phân tích nâng cao được xem là phần mở rộng.
+\end{itemize}
+
+\subsection{Tiêu chí thành công}
+Các tiêu chí thành công mang tính định hướng đánh giá hệ thống được đề xuất như sau:
+\begin{itemize}
+  \item Độ trễ truyền đơn từ khối phục vụ đến bếp được giảm thiểu.
+  \item Tỷ lệ sai sót do thiếu/nhầm thông tin tùy biến trong đơn hàng được giảm.
+  \item Thời gian ra món (ticket time) được cải thiện và tỷ lệ đúng hạn theo mục tiêu thời gian được nâng cao.
+  \item Báo cáo vận hành đủ chi tiết để xác định giờ cao điểm và món bán chạy.
+  \item Việc mở rộng quy tắc ưu tiên bếp hoặc trạng thái xử lý được thực hiện với thay đổi tối thiểu lên các mô-đun khác, qua đó phản ánh tính mô-đun và khả năng mở rộng kiến trúc.
+\end{itemize}

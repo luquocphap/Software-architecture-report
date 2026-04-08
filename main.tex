@@ -1,0 +1,31 @@
+\input{format/library}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT START (abbreviations & symbols)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+% TITLE PAGE
+\input{format/coverpage}
+\pagebreak
+% TABLE OF CONTENT
+\pagenumbering{arabic}
+\tableofcontents
+\newpage
+\listoffigures
+\addcontentsline{toc}{section}{\listfigurename}
+\listoftables
+\addcontentsline{toc}{section}{\listtablename}
+\newpage
+\input{format/workload}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CONTENT, INCLUDE HERE 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{source/Context Describe}
+\newpage
+\input{source/Mô hình hóa hệ thống}
+\newpage
+\input{source/Thiết kế kiến trúc}
+\newpage
+\input{source/Triển khai}
+\newpage
+\end{document}
