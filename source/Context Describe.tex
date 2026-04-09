@@ -35,13 +35,20 @@ Các tác nhân chính được xác định bao gồm khách hàng, host, nhân
 \subsection{Yêu cầu chức năng}
 Các yêu cầu chức năng cốt lõi của IRMS được tổng hợp như sau:
 \begin{enumerate}
-  \item \textbf{Quản lý thực đơn:} cho phép tạo/cập nhật/xóa (CRUD) món, cập nhật giá và đánh dấu món không khả dụng theo thời gian thực.
-  \item \textbf{Quản lý đơn hàng:} cho phép tạo đơn theo bàn; thêm/xóa món; ghi nhận tùy biến và ghi chú; theo dõi trạng thái của đơn và từng món.
-  \item \textbf{Điều phối bếp/KDS:} hỗ trợ định tuyến theo trạm; tổ chức hàng đợi theo thời gian và nhóm món; cung cấp cảnh báo theo ngưỡng thời gian.
-  \item \textbf{Quản lý bàn và đặt chỗ:} theo dõi trạng thái bàn; ước tính thời gian chờ; quản lý reservation và waitlist.
-  \item \textbf{Thanh toán và hóa đơn:} tổng hợp chi phí; hỗ trợ đa phương thức thanh toán; hỗ trợ tách hóa đơn và quản lý tip; xuất hóa đơn.
-  \item \textbf{Tồn kho:} cập nhật tiêu hao thủ công; cảnh báo thiếu; lưu trữ lịch sử tiêu hao.
-  \item \textbf{Phân tích và báo cáo:} tạo báo cáo doanh thu, giờ cao điểm, món bán chạy; phân tích chậm trễ và tắc nghẽn vận hành; hỗ trợ xuất dữ liệu.
+  \item \textbf{Xem menu (view):} hiển thị thực đơn trên menu màn hình của nhân viên
+  \item \textbf{Thực hiện order (create):} cho phép nhân viên ghi nhận order từ khách hàng và đưa order lên hệ thống 
+  \item \textbf{Note đặc biệt trên order (customize):} cho phép nhân viên note: yêu cầu đặc biệt, dị ứng lựa chọn combo và tùy chỉnh theo ý khách hàng
+  \item \textbf{Quản lý thực đơn:} cho phép tạo/cập nhật/xóa (CRUD) món, cập nhật giá và đánh dấu món không khả dụng theo thời gian thực
+  \item \textbf{Cập nhật giá:} hệ thống cho phép quản trị viên thay đổi giá các món ăn
+  \item \textbf{Thực hiện khuyến mãi trên menu:} hệ thống cho phép quản trị viên thiết lập các chương trình khuyến mãi dựa trên các món trong menu hoặc các combo đặc biệt với giá ưu đãi
+  \item \textbf{Truyền order đến nhà bếp:} hệ thống phải cập nhật các order được tạo mới liên tục cho nhân viên nhà bếp thấy được
+  \item \textbf{Hiển thị danh sách order (View):} hệ thống phải hiển thị bảng thức ăn theo hàng đợi, theo loại thức ăn và theo prep station
+  \item \textbf{Quản lý order trong nhà bếp:} hệ thống phải thông báo mỗi khi có order mới và cảnh báo những order sắp hết deadline
+  \item \textbf{Cập nhật trạng thái order (Update):} hệ thống phải cho phép đầu bếp thay đổi trạng thái order theo các bước làm món để kiểm soát (Bắt đầu làm, đang nấu, Đã xong)
+  \item \textbf{Quản lý bàn và đặt chỗ:} theo dõi trạng thái bàn; ước tính thời gian chờ; quản lý reservation và waitlist
+  \item \textbf{Thanh toán và hóa đơn:} tổng hợp chi phí; hỗ trợ đa phương thức thanh toán; hỗ trợ tách hóa đơn và quản lý tip; xuất hóa đơn
+  \item \textbf{Tồn kho:} cập nhật tiêu hao thủ công; cảnh báo thiếu; lưu trữ lịch sử tiêu hao
+  \item \textbf{Phân tích và báo cáo:} tạo báo cáo doanh thu, giờ cao điểm, món bán chạy; phân tích chậm trễ và tắc nghẽn vận hành; hỗ trợ xuất dữ liệu
   \item \textbf{Quản trị và bảo mật:} triển khai RBAC; duy trì audit log cho các hành vi nhạy cảm.
 \end{enumerate}
 

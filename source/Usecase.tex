@@ -1,0 +1,1019 @@
+\section{Use Case Scenarios - System Modeling}
+Các kịch bản sử dụng (Use Case Scenarios) được sử dụng để mô tả có cấu trúc các tương tác giữa tác nhân và hệ thống trong các tình huống nghiệp vụ điển hình. Trên cơ sở đó, các luồng dữ liệu, điểm đồng bộ trạng thái, cũng như các ràng buộc vận hành (ví dụ: độ trễ, khả dụng, tính nhất quán) được làm rõ một cách rõ ràng theo quy trình. Hơn nữa, khi hệ thống được định hướng theo kiến trúc phân tán (ví dụ: Microservices), các Use Case đóng vai trò như một mô tả ranh giới domain, điểm tích hợp (integration points), và các sự kiện/trigger cần được phát sinh hoặc tiêu thụ. Do vậy, các Use Case được xem là đầu vào quan trọng để xác định module/component boundary, cơ chế giao tiếp (sync/async), và các trade-off kiến trúc liên quan.
+
+% =========================================================
+% UC1
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC1} & \textbf{Xem menu (View)} \\
+\hline
+Use case & View Menu \\
+\hline
+Mục tiêu & Nhân viên xem menu theo danh mục, trạng thái món, giá hiện tại \\
+\hline
+Actors chính & Server/Front-of-house staff, Manager \\
+\hline
+Actors phụ & Hệ thống POS/Menu service \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Người dùng đã đăng nhập
+\item Thiết bị có kết nối mạng (hoặc có cache menu offline)
+\item Menu đã được cấu hình và đang Active
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Nhân viên mở màn hình Menu \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Nhân viên chọn module Menu
+\item Hệ thống tải menu (danh mục, món, giá, ảnh, mô tả, option, trạng thái còn/hết)
+\item Hệ thống hiển thị danh sách món theo Category (Khai vị/Món chính/Đồ uống…)
+\item Nhân viên có thể:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Tìm kiếm theo tên/mã món
+\item Lọc theo category, best-seller, đang khuyến mãi
+\item Xem chi tiết món (mô tả, dị ứng, option)
+\end{itemize}
+\vspace{-0.5em}
+\item Hệ thống cập nhật trạng thái “Còn/Hết” theo tồn kho hoặc cấu hình bếp
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Mất mạng $\rightarrow$ hệ thống hiển thị menu cache gần nhất + cảnh báo “Menu có thể không mới nhất”
+\item A2: Menu trống/chưa publish $\rightarrow$ hiển thị thông báo và hướng dẫn liên hệ manager
+\item A3: Món bị disable $\rightarrow$ món vẫn có thể hiện mờ hoặc ẩn tùy cấu hình
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Menu hiển thị thành công; không thay đổi dữ liệu nghiệp vụ
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Quy tắc / dữ liệu &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Giá hiển thị là giá hiệu lực hiện tại (có thể đã áp dụng khuyến mãi)
+\item Món Out of stock không thể chọn để order
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC2
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC2} & \textbf{Thực hiện order (Create)} \\
+\hline
+Use case & Create Order \\
+\hline
+Mục tiêu & Server tạo order cho bàn hoặc khách mang đi và gửi vào hệ thống \\
+\hline
+Actors chính & Server/Front-of-house staff, Manager \\
+\hline
+Actors phụ & Kitchen system, Inventory (nếu trừ tồn), Billing (Có thể có tùy theo dev) \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Đã đăng nhập
+\item Có bàn hoặc chọn loại order (takeaway/delivery)
+\item Menu có sẵn
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Nhân viên bấm New Order hoặc chọn bàn $\rightarrow$ Order \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Nhân viên chọn bàn hoặc loại đơn (dine-in/takeaway)
+\item Hệ thống tạo Order draft với mã tạm
+\item Nhân viên chọn món từ menu, nhập số lượng
+\item Hệ thống tính tạm tính (subtotal) theo giá hiện hành, hiển thị thời gian tạo
+\item Nhân viên xác nhận “Gửi bếp/Place order”
+\item Hệ thống:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Validate món còn bán / còn nguyên liệu (nếu có kiểm tra)
+\item Gán số order, trạng thái New
+\item Ghi nhận người tạo, thời điểm
+\end{itemize}
+\vspace{-0.5em}
+\item Hệ thống đẩy order sang Kitchen system theo prep station
+\item Hệ thống hiển thị order trong danh sách theo bàn
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Món hết hàng khi gửi $\rightarrow$ hệ thống báo lỗi, gợi ý món thay thế hoặc cho phép xóa món đó
+\item A2: Order gửi thất bại do mạng $\rightarrow$ chuyển sang hàng đợi sync, hiển thị “Pending sync”, tự retry
+\item A3: 2 người order cùng một bàn $\rightarrow$ merge order
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Order được tạo và sẵn sàng cho bếp xử lý
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Quy tắc / dữ liệu &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Order phải có ít nhất 1 món
+\item Audit log: tạo order (ai, lúc nào, thiết bị nào)
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC3
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC3} & \textbf{Note Order (Customize)} \\
+\hline
+Use case & Customize Order Item \\
+\hline
+Mục tiêu & Ghi nhận yêu cầu đặc biệt, dị ứng, combo, mức chín, thay thế nguyên liệu… \\
+\hline
+Actors chính & Server/Front-of-house staff, Manager \\
+\hline
+Actors phụ & Server \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Có order draft hoặc order đang cho phép chỉnh
+\item Món có option/cấu hình note
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Đang trong quá trình new order hoặc chỉnh sửa ở danh sách order \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Nhân viên chọn line-item (món) cần tùy chỉnh
+\item Hệ thống hiển thị:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Option có cấu trúc (size, topping, …)
+\item Note tự do
+\item Allergy alert - Dị ứng
+\end{itemize}
+\vspace{-0.5em}
+\item Nhân viên chọn option và nhập note
+\item Hệ thống hiển thị preview món sau tùy chỉnh + chênh lệch giá (nếu topping tính phí)
+\item Nhân viên lưu
+\item Khi gửi bếp, hệ thống truyền đầy đủ option/note đến Kitchen system
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Note vượt giới hạn ký tự $\rightarrow$ hệ thống yêu cầu rút gọn
+\item A2: Option xung đột (vd: “no ice” nhưng chọn “extra ice”) $\rightarrow$ hệ thống cảnh báo và yêu cầu chọn lại
+\item A3: Allergy flag bật $\rightarrow$ hệ thống yêu cầu xác nhận thêm (“Bạn đã xác nhận với khách?”)
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Lưu tùy chỉnh
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Quy tắc / dữ liệu &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Một số note có thể bị chặn theo policy (vd: không cho “free topping” nếu không có quyền)
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC4
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC4} & \textbf{Quản lý món ăn trong menu} \\
+\hline
+Use case & Menu Item CRUD \\
+\hline
+Mục tiêu & Admin/Manager thêm, sửa, xóa (hoặc disable) món \\
+\hline
+Actors chính & Administrator/Manager \\
+\hline
+Actors phụ & Audit/Logging, Sync service tới thiết bị \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Người dùng có quyền “Menu:Manage”
+\item Có danh mục menu sẵn (hoặc tạo danh mục trước)
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Admin mở “Menu Management” \\
+\hline
+Luồng chính (Create) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Admin chọn “Add item”
+\item Nhập thông tin: tên, category, mô tả, ảnh, prep station, tax class, tags dị ứng, option set
+\item Nhập giá mặc định
+\item Chọn trạng thái: Active/Inactive
+\item Lưu
+\item Hệ thống validate dữ liệu và tạo món mới
+\item Hệ thống publish thay đổi đến các hệ thống khác
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng chính (Update) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Admin chọn món $\rightarrow$ “Edit”
+\item Sửa thuộc tính, giá
+\item Lưu và publish
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng chính (Delete/Disable) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Admin chọn món $\rightarrow$ “Delete” hoặc “Disable”
+\item Hệ thống kiểm tra ràng buộc:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Món có trong order đang mở?
+\item Món có trong promo/combo đang active?
+\end{itemize}
+\vspace{-0.5em}
+\item Nếu được phép $\rightarrow$ xóa hoặc set Inactive
+\item Publish
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Không cho xóa hard-delete vì có lịch sử $\rightarrow$ hệ thống chỉ cho “Disable”
+\item A2: Thiếu trường bắt buộc $\rightarrow$ báo lỗi cụ thể
+\item A3: Xung đột đồng bộ (2 admin sửa) $\rightarrow$ cơ chế versioning/last-write-wins + cảnh báo
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Menu được cập nhật; audit log ghi nhận
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC5
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC5} & \textbf{Thực hiện khuyến mãi trên menu} \\
+\hline
+Use case & Manage Promotions \\
+\hline
+Mục tiêu & Thiết lập promo theo món/combo/khung giờ/điều kiện \\
+\hline
+Actors chính & Manager/Admin \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Có quyền “Promo:Manage”
+\item Menu items đã tồn tại
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Mở “Promotions” \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Manager chọn “Create Promotion”
+\item Chọn loại:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Giảm \% theo món
+\item Giảm số tiền cố định
+\item Combo set price
+\item Buy X Get Y
+\end{itemize}
+\vspace{-0.5em}
+\item Chọn danh sách món áp dụng và điều kiện (giờ, ngày, số lượng, nhóm khách…)
+\item Đặt thời gian hiệu lực và ưu tiên (priority)
+\item Lưu
+\item Hệ thống validate xung đột promo và tính thử (simulation)
+\item Publish promo đến POS
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Promo xung đột $\rightarrow$ hệ thống yêu cầu đặt priority hoặc không cho chồng
+\item A2: Combo thiếu món thành phần $\rightarrow$ báo lỗi
+\item A3: Promo hết hạn $\rightarrow$ tự động disable
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Promo hoạt động; giá hiển thị/áp vào bill theo rule
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC6
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC6} & \textbf{Truyền order đến nhà bếp} \\
+\hline
+Use case & Send Order to Kitchen (Realtime) \\
+\hline
+Mục tiêu & Order mới xuất hiện trên Kitchen system gần realtime, đúng station \\
+\hline
+Actors chính & Server (người tạo), Kitchen team (người nhận) \\
+\hline
+Actors phụ & Message broker/Sync service (Nếu có) \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Order đã “Placed”
+\item Kitchen system online hoặc có cơ chế nhận lại khi online
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Order được gửi/được update \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item POS gửi event “OrderPlaced/OrderUpdated”
+\item Hệ thống phân tách ticket theo prep station (grill/salad/bar…)
+\item Kitchen system nhận event và hiển thị ticket mới
+\item Kitchen phát âm thanh/notify theo cấu hình
+\item Hệ thống ghi log thời gian “sent-to-kitchen”
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Kitchen system offline $\rightarrow$ lưu hàng đợi; khi Kitchen system online thì replay
+\item A2: Duplicate event $\rightarrow$ Kitchen system idempotent - nhận diện “đây là event đã xử lý rồi” và bỏ qua/ghi đè.
+\item A3: Station mapping thiếu $\rightarrow$ đưa vào “Unassigned” và cảnh báo manager
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Bếp nhìn thấy order và có thể bắt đầu xử lý
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC7
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC7} & \textbf{Hiển thị danh sách order (Kitchen View)} \\
+\hline
+Use case & Kitchen Order Queue View \\
+\hline
+Mục tiêu & Bếp xem hàng đợi theo thời gian, theo loại món, theo station \\
+\hline
+Actors chính & Chef/Kitchen staff \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Đăng nhập vào kitchen system
+\item Có order đang chờ
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Mở màn hình “Queue” \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Nhân viên bếp chọn chế độ xem: All / Station / Category
+\item Hệ thống hiển thị danh sách ticket theo thứ tự (FIFO hoặc theo SLA - Thời gian tối đa có thể để hoàn thành 1 món)
+\item Mỗi ticket hiển thị: bàn, thời gian vào bếp, danh sách món, note dị ứng, trạng thái
+\item Cho phép filter: “New”, “In progress”, “Near deadline”
+\item Auto-refresh realtime
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Quá nhiều ticket $\rightarrow$ phân trang/virtual list
+\item A2: Lỗi sync $\rightarrow$ hiển thị trạng thái “Last updated at …”
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện & Không đổi dữ liệu (chỉ view) \\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC8
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC8} & \textbf{Quản lý order trong nhà bếp (Notify + Deadline)} \\
+\hline
+Use case & Kitchen Order Monitoring \& Alerts \\
+\hline
+Mục tiêu & Cảnh báo order mới và order gần quá SLA/deadline \\
+\hline
+Actors chính & Kitchen lead/Chef \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item SLA time per item/station được cấu hình (hoặc default)
+\item Kitchen system bật notifications
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Order mới đến hoặc timer đạt ngưỡng cảnh báo \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Khi ticket mới đến, Kitchen system phát thông báo âm thanh + badge “New”
+\item Hệ thống bắt đầu đếm timer từ “sent-to-kitchen” hoặc “start cooking” tùy rule
+\item Khi gần deadline (vd: 80\% SLA), ticket đổi màu và đưa lên top
+\item Khi quá deadline, Kitchen system hiển thị cảnh báo mạnh hơn (màu đỏ/đẩy lên đầu)
+\item Kitchen lead có thể mở ticket để xem (station nào đang chậm)
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: SLA chưa cấu hình $\rightarrow$ dùng default (ví dụ 15 phút) và cảnh báo “SLA default”
+\item A2: Ticket bị pause (do chờ khách) $\rightarrow$ cho phép “Hold” để dừng timer (nếu có quyền)
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện & Trạng thái cảnh báo cập nhật \\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC9
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC9} & \textbf{Cập nhật trạng thái order (Kitchen Update)} \\
+\hline
+Use case & Update Cooking Status \\
+\hline
+Mục tiêu & Chef cập nhật trạng thái theo tiến trình: Bắt đầu làm $\rightarrow$ Đang nấu $\rightarrow$ Đã xong \\
+\hline
+Actors chính & Chef/Kitchen staff \\
+\hline
+Actors phụ & Server (nhận thông báo món xong), Front of House display \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Ticket tồn tại và thuộc station của chef
+\item Người dùng có quyền “Kitchen:UpdateStatus”
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Chef thao tác trên ticket \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Chef mở ticket
+\item Bấm “Start” $\rightarrow$ trạng thái ticket/item chuyển sang In progress
+\item (Option) bấm “Cooking”/step tiếp theo nếu hệ thống có nhiều bước
+\item Khi hoàn tất, bấm “Done”
+\item Hệ thống:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item ghi thời gian start/finish
+\item cập nhật Kitchen system và gửi event về Front of House để server biết món ra
+\end{itemize}
+\vspace{-0.5em}
+\item Front of House hiển thị “Ready to serve”
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Chef bấm nhầm “Done” $\rightarrow$ nếu policy cho phép, có “Undo” trong X giây + audit
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Trạng thái món và ticket cập nhật; dữ liệu phục vụ báo cáo hiệu suất
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC10
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC10} & \textbf{Quản lý bàn ghế (Table Management)} \\
+\hline
+Use case & Manage Tables \\
+\hline
+Mục tiêu & Quản lý sơ đồ bàn, trạng thái bàn trống/đang phục vụ/đang chờ dọn,… \\
+\hline
+Actors chính & Host/Server/Manager \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Có floor plan và danh sách bàn
+\item Có quyền “Table:View” (server) hoặc “Table:Manage” (manager)
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Mở “Floor plan/Tables” \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Host xem bản đồ bàn theo khu vực
+\item Hệ thống hiển thị trạng thái:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Available / Seated / Ordering / Serving / Check requested / Dirty
+\end{itemize}
+\vspace{-0.5em}
+\item Khi xếp khách:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Host chọn bàn $\rightarrow$ “Seat party”
+\item nhập số khách, tên (tùy)
+\item hệ thống set bàn sang Seated và bắt đầu timer
+\end{itemize}
+\vspace{-0.5em}
+\item Server có thể mở bàn để xem order hiện có, trạng thái món, tình trạng hóa đơn
+\item Manager có thể gộp/tách bàn, đổi bàn (move table), khóa bàn
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Bàn đã có khách nhưng host seat nhầm $\rightarrow$ hệ thống cảnh báo + yêu cầu quyền manager
+\item A2: Move table khi đã có order $\rightarrow$ hệ thống chuyển toàn bộ order \& bill mapping sang bàn mới
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Trạng thái bàn cập nhật và phản ánh trên toàn hệ thống
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC11
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC11} & \textbf{Xử lý đặt bàn và hàng đợi (Reservation \& Queue)} \\
+\hline
+Use case & Reservation \& Waitlist \\
+\hline
+Mục tiêu & Đặt bàn theo lịch, quản lý hàng đợi, gửi thông báo cho khách \\
+\hline
+Actors chính & System \\
+\hline
+Actors phụ & Customer (nhận thông báo), Messaging service (SMS/Zalo/Email) \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Có cấu hình giờ mở cửa, sức chứa, bàn
+\item Tích hợp kênh nhắn tin (nếu có)
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Host tạo reservation hoặc thêm waitlist \\
+\hline
+Luồng chính (Reservation) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Host chọn “New reservation”
+\item Nhập: tên, SĐT, số khách, ngày giờ, ghi chú
+\item Hệ thống gợi ý bàn phù hợp và check conflict
+\item Host xác nhận
+\item Hệ thống tạo reservation trạng thái “Booked”
+\item (Tùy) Gửi xác nhận cho khách
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng chính (Waitlist) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Host chọn “Add to waitlist”
+\item Nhập thông tin khách + party size
+\item Hệ thống ước tính thời gian chờ (dựa trên turnover lịch sử + bàn trống)
+\item Khi có bàn trống, host bấm “Notify”
+\item Hệ thống gửi thông báo + đặt thời hạn giữ chỗ (hold time)
+\item Host seat khách $\rightarrow$ chuyển waitlist entry thành seated
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Khách không đến $\rightarrow$ đánh dấu no-show; ghi log
+\item A2: Không gửi được SMS $\rightarrow$ hiển thị lỗi và cho phép gọi tay
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Reservation/waitlist cập nhật; timeline phục vụ đồng bộ với bàn
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC12
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC12} & \textbf{Quản lý hóa đơn (Billing \& Payment)} \\
+\hline
+Use case & Bill Management \& Payment \\
+\hline
+Mục tiêu & Gom món vào hóa đơn theo bàn, thanh toán đa phương thức, chia bill, tip \\
+\hline
+Actors chính & Cashier/Server \\
+\hline
+Actors phụ & Payment gateway, Bank/Wallet, Manager (refund/void) \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Bàn có order đã phục vụ hoặc đang phục vụ
+\item Có quyền “Bill:Checkout”
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Chọn bàn $\rightarrow$ “Checkout/Payment” \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Cashier mở hóa đơn của bàn
+\item Hệ thống hiển thị danh sách món, trạng thái phục vụ, subtotal, tax, discount, tip
+\item Nếu khách yêu cầu chia bill:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item chọn “Split”
+\item chia theo item / theo người / theo \%
+\end{itemize}
+\vspace{-0.5em}
+\item Chọn phương thức thanh toán: thẻ / chuyển khoản / ví / tiền mặt
+\item Nhập/nhận số tiền, tip
+\item Hệ thống xử lý thanh toán (gọi gateway nếu online)
+\item Nếu thành công:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item hóa đơn trạng thái “Paid”
+\item in/ gửi hóa đơn điện tử (tùy)
+\item bàn chuyển trạng thái “Dirty/Cleaning”
+\end{itemize}
+\vspace{-0.5em}
+\item Lưu audit
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Gateway fail $\rightarrow$ cho retry hoặc đổi phương thức
+\item A2: Thanh toán một phần (partial) $\rightarrow$ hóa đơn “Partially paid”, còn balance
+\item A3: Refund/Void $\rightarrow$ yêu cầu quyền manager + lý do + audit log
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Doanh thu ghi nhận, dữ liệu báo cáo cập nhật
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC13
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC13} & \textbf{Quản lý số lượng hàng hóa (Inventory)} \\
+\hline
+Use case & Ingredient Usage \& Low-stock Alerts \\
+\hline
+Mục tiêu & Nhân viên nhập lượng sử dụng nguyên liệu, cảnh báo thấp, dự đoán reorder \\
+\hline
+Actors chính & Kitchen staff/Manager \\
+\hline
+Actors phụ & Reporting/Forecasting service \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Có danh mục nguyên liệu + mức min threshold
+\item Có mapping món $\rightarrow$ nguyên liệu (nếu muốn tự động trừ)
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Nhập usage hoặc hệ thống tự trừ theo order \\
+\hline
+Luồng chính (Manual usage) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Nhân viên mở module Inventory $\rightarrow$ “Record usage”
+\item Chọn nguyên liệu, nhập số lượng dùng và đơn vị
+\item Chọn lý do (prep/spoilage/adjustment)
+\item Lưu
+\item Hệ thống cập nhật tồn kho, ghi audit
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng chính (Low-stock alert) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Khi tồn < threshold, hệ thống gửi cảnh báo tới manager
+\item Manager xem danh sách cần reorder
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng chính (Forecast reorder) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Hệ thống tổng hợp lịch sử usage/sales
+\item Đưa ra dự báo lượng cần đặt cho kỳ tới (ngày/tuần)
+\item Manager xuất danh sách reorder
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Nhập sai đơn vị $\rightarrow$ hệ thống yêu cầu quy đổi hoặc từ chối
+\item A2: Không đủ quyền điều chỉnh tồn $\rightarrow$ chỉ manager được chỉnh
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Tồn kho cập nhật; cảnh báo \& dự báo sẵn sàng
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC14
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC14} & \textbf{Phân tích và báo cáo (Analytics \& Reporting)} \\
+\hline
+Use case & Sales \& Operations Reporting \\
+\hline
+Mục tiêu & Báo cáo doanh thu, giờ cao điểm, best-seller, bottleneck, hiệu suất nhân sự; xuất báo cáo \\
+\hline
+Actors chính & Administrator/Manager \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Có quyền “Reports:View”
+\item Có dữ liệu giao dịch
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & Mở module “Reports” \\
+\hline
+Luồng chính &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Manager chọn loại báo cáo: Sales, Menu performance, Labor, Kitchen SLA, Table turnover
+\item Chọn khoảng thời gian, chi nhánh, ca làm
+\item Hệ thống hiển thị dashboard:
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item doanh thu theo giờ/ngày
+\item top món bán chạy
+\item ticket time trung bình theo station
+\item tỷ lệ hủy/void/refund
+\end{itemize}
+\vspace{-0.5em}
+\item Manager chọn “Export” (CSV/PDF)
+\item Hệ thống tạo file và cho tải về (hoặc gửi email)
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Khoảng thời gian quá lớn $\rightarrow$ hệ thống chạy nền và thông báo khi xong
+\item A2: Không có dữ liệu $\rightarrow$ hiển thị trạng thái empty
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Báo cáo được xem/xuất; không ảnh hưởng vận hành
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
+
+% =========================================================
+% UC15
+% =========================================================
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.70\textwidth}|}
+\hline
+\textbf{UC15} & \textbf{Kiểm soát an toàn và quyền truy cập (RBAC - Kiểm soát truy cập theo vai trò + Audit logs)} \\
+\hline
+Use case & Access Control \& Audit Logs \\
+\hline
+Mục tiêu & Phân quyền theo role; audit các hành động nhạy cảm (hủy đơn, hoàn tiền…) \\
+\hline
+Actors chính & Administrator \\
+\hline
+Actors phụ & Manager (xử lý nghiệp vụ nhạy cảm), Auditor \\
+\hline
+Tiền điều kiện &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Hệ thống có danh sách role: managers, servers, chefs, cashiers
+\item Người dùng được gán role
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Kích hoạt & User thao tác chức năng cần quyền hoặc admin xem audit \\
+\hline
+Luồng chính (RBAC) - Role-based access control: &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item User thực hiện hành động (vd: refund)
+\item Hệ thống kiểm tra quyền theo role + policy
+\item Nếu đủ quyền $\rightarrow$ cho phép thao tác
+\item Nếu không đủ $\rightarrow$ chặn và hiển thị thông báo “Access denied”
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng chính (Audit log) &
+\vspace{-0.5em}
+\begin{enumerate}[leftmargin=*]
+\item Khi hành động nhạy cảm xảy ra (void/refund/discount override/price change):
+\item Hệ thống ghi audit: userId, role, action, before/after, timestamp, reason, device
+\item Admin mở “Audit logs”, filter theo thời gian/user/action
+\item Admin export log nếu cần
+\end{enumerate}
+\vspace{-0.5em}
+\\
+\hline
+Luồng thay thế / ngoại lệ &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item A1: Manager override: server không có quyền $\rightarrow$ yêu cầu manager nhập PIN/approve
+\item A2: Audit storage lỗi $\rightarrow$ vẫn cho phép/hoặc chặn tùy mức độ nghiêm trọng
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+Hậu điều kiện &
+\vspace{-0.5em}
+\begin{itemize}[leftmargin=*]
+\item Quyền truy cập được đảm bảo; truy vết đầy đủ
+\end{itemize}
+\vspace{-0.5em}
+\\
+\hline
+\end{longtable}
