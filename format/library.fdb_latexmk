@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1775665225.42252 "c:/Users/nhatq/Downloads/Software_Architecture_1/format/library.tex" "library.pdf" "library" 1775665226.91805 2
-  "c:/Users/nhatq/Downloads/Software_Architecture_1/format/library.tex" 1775665222 8391 06cb1e8718186cd1c48334551a6f486f ""
+["pdflatex"] 1775917789.20334 "c:/Users/nhatq/Downloads/Software_Architecture_1/format/library.tex" "library.pdf" "library" 1775917790.7144 2
+  "c:/Users/nhatq/Downloads/Software_Architecture_1/format/library.tex" 1775665737 8360 6dd922ec7ec8d791ab6686b7a579b7e4 ""
   "c:/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1775652574 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/vntex/vnr/vnr10.tfm" 1775661086 3980 a378198bbdb2c6fcd4b722396a62ad27 ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/vntex/vnr/vnr12.tfm" 1775661086 3984 be7b630197255361b12d153ce5e1bc5b ""
@@ -179,8 +179,8 @@
   "c:/texlive/2026/texmf-dist/web2c/texmf.cnf" 1775648290 43630 e9fa012910491fe5ae08a72c3c2997a7 ""
   "c:/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1775662206 3648458 3b92c4b2d5f485e1f23feaac3c416283 ""
   "c:/texlive/2026/texmf.cnf" 1775661885 713 e69b156964470283e0530f5060668171 ""
-  "library.aux" 1775665217 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "library.tex" 1775665222 8391 06cb1e8718186cd1c48334551a6f486f ""
+  "library.aux" 1775917781 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "library.tex" 1775665737 8360 6dd922ec7ec8d791ab6686b7a579b7e4 ""
   (generated)
   "library.aux"
   "library.log"
