@@ -1,0 +1,106 @@
+\section{Xây dựng kiến trúc phần mềm cho hệ thống}
+\subsection{Module view}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{image/4.1.png}
+    \caption{Module View của hệ thống}
+    \label{fig:module-view}
+\end{figure}
+
+Sơ đồ Module View mô tả kiến trúc hệ thống theo mô hình phân lớp (layered architecture), giúp tách biệt trách nhiệm và tăng khả năng mở rộng, bảo trì. Hệ thống được chia thành 4 lớp chính:
+
+\textbf{Presentation Layer}: 
+Tiếp nhận request từ client thông qua HTTP và JWT. Các controller như \textit{OrderController, MenuController, PaymentController, KitchenController, ReportController} chịu trách nhiệm xử lý request và chuyển tiếp xuống các lớp bên dưới.
+
+\textbf{Application / Facade Layer}: 
+Đóng vai trò điều phối logic nghiệp vụ thông qua các facade như \textit{OrderingFacade, CheckoutFacade, AdminCatalogFacade, ReportingDataFacade}. Lớp này giúp giảm sự phụ thuộc giữa Presentation và Domain.
+
+\textbf{Domain Layer}: 
+Chứa các service xử lý nghiệp vụ chính như \textit{OrderService, MenuService, InventoryService, PaymentService, PromotionService, KitchenService, SeatingService, ReportService}.
+
+\textbf{Infrastructure Layer}: 
+Cung cấp các thành phần kỹ thuật như \textit{Repository (JPA), PostgreSQL, EventBus, JWT Security} để lưu trữ dữ liệu và hỗ trợ giao tiếp hệ thống.
+
+\textbf{Luồng xử lý}: 
+Client gửi request $\rightarrow$ JWT Security $\rightarrow$ Presentation Layer $\rightarrow$ Application Layer $\rightarrow$ Domain Layer $\rightarrow$ Infrastructure Layer.
+
+
+
+\subsection{Component \& Connector view}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{image/4.2.png}
+    \caption{Component \& Connector View của hệ thống}
+    \label{fig:cc-view}
+\end{figure}
+
+Sơ đồ Component \& Connector (C\&C) mô tả cách các thành phần trong hệ thống tương tác với nhau thông qua các giao thức và cơ chế kết nối.
+
+\textbf{Thành phần chính:}
+\begin{itemize}
+    \item \textbf{Client}: Bao gồm POS hoặc trình duyệt, gửi request đến hệ thống thông qua HTTP kèm JWT.
+    \item \textbf{Controller Layer}: Gồm các controller như \textit{OrderController, MenuController, PaymentController}, chịu trách nhiệm nhận và xử lý request ban đầu.
+    \item \textbf{Facade Layer}: Bao gồm \textit{OrderingFacade, CheckoutFacade}, đóng vai trò điều phối các service nghiệp vụ.
+    \item \textbf{Domain Services}: Các service như \textit{OrderService, MenuService, InventoryService, PaymentService} xử lý logic chính của hệ thống.
+    \item \textbf{Database}: \textit{PostgreSQL} được sử dụng để lưu trữ dữ liệu.
+\end{itemize}
+
+\textbf{Connector (kết nối):}
+\begin{itemize}
+    \item \textbf{JWT Security}: Xác thực và phân quyền request trước khi vào hệ thống.
+    \item \textbf{HTTP}: Giao tiếp giữa Client và hệ thống.
+    \item \textbf{JPA}: Kết nối giữa service và cơ sở dữ liệu.
+    \item \textbf{EventBus}: Hỗ trợ giao tiếp bất đồng bộ giữa các service (ví dụ: OrderService phát sự kiện cho InventoryService).
+\end{itemize}
+
+\textbf{Luồng xử lý:}  
+Client gửi request $\rightarrow$ JWT Security $\rightarrow$ Controller $\rightarrow$ Facade $\rightarrow$ Service $\rightarrow$ Database hoặc EventBus.
+
+
+
+\subsection{Allocation view}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{image/4.3.png}
+    \caption{Allocation View của hệ thống}
+    \label{fig:allocation-view}
+\end{figure}
+
+Sơ đồ Allocation View mô tả cách các thành phần phần mềm được triển khai trên hạ tầng thực tế (deployment), bao gồm các nền tảng cloud và các dịch vụ liên quan.
+
+\textbf{Thành phần chính:}
+\begin{itemize}
+    \item \textbf{Client Zone}: Bao gồm \textit{User Browser} và \textit{POS Terminal}, là nơi người dùng tương tác với hệ thống thông qua giao thức HTTPS.
+    
+    \item \textbf{Frontend (Vercel)}: Ứng dụng web (ví dụ: Next.js) được triển khai trên nền tảng Vercel, chịu trách nhiệm hiển thị giao diện và gửi request đến backend thông qua API.
+    
+    \item \textbf{Backend (Render)}: Hệ thống backend (Spring Boot API) được deploy trên Render, xử lý logic nghiệp vụ và cung cấp các endpoint cho frontend. Ngoài ra còn có \textit{Async Worker} để xử lý các tác vụ bất đồng bộ.
+    
+    \item \textbf{Database (Neon)}: Sử dụng PostgreSQL được host trên nền tảng Neon để lưu trữ dữ liệu, hỗ trợ khả năng mở rộng và quản lý hiệu quả.
+    
+\end{itemize}
+
+\textbf{Thành phần hỗ trợ:}
+\begin{itemize}
+    \item \textbf{Event Bus}: Hỗ trợ giao tiếp bất đồng bộ giữa các thành phần trong hệ thống (ví dụ: xử lý background job).
+    \item \textbf{Security \& Configuration}: Sử dụng \textit{Environment Variables / Secrets} để quản lý thông tin nhạy cảm.
+    \item \textbf{Observability}: Bao gồm \textit{Logging} và \textit{Monitoring} giúp theo dõi và giám sát hệ thống.
+\end{itemize}
+
+\textbf{Luồng xử lý:}  
+Client gửi request $\rightarrow$ Frontend (Vercel) $\rightarrow$ Backend (Render) $\rightarrow$ Database (Neon).  
+Ngoài ra, backend có thể gửi sự kiện qua Event Bus để xử lý bất đồng bộ bởi các worker.
+
+\textbf{Ý nghĩa kiến trúc:}
+\begin{itemize}
+    \item Tách biệt rõ ràng giữa frontend, backend và database theo mô hình cloud-native
+    \item Dễ dàng mở rộng từng thành phần độc lập
+    \item Tận dụng các nền tảng managed service (Vercel, Render, Neon) để giảm chi phí vận hành
+    \item Hỗ trợ triển khai và scale hệ thống linh hoạt
+\end{itemize}
+
+
+
