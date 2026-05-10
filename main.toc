@@ -1,0 +1,48 @@
+\contentsline {section}{Danh mục hình vẽ}{3}{section*.4}%
+\contentsline {section}{Danh mục bảng biểu}{3}{section*.5}%
+\contentsline {section}{Danh sách thành viên và công việc}{4}{section*.6}%
+\contentsline {section}{\numberline {1}Bối cảnh hệ thống Intelligent Restaurant Management System}{5}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Giới thiệu và mục tiêu}{5}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Phạm vi hệ thống và các phân hệ chức năng}{5}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Đặt món số và quản lý thực đơn}{5}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2}Hiển thị đơn bếp và điều phối luồng chế biến}{6}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.3}Quản lý bàn và đặt chỗ}{6}{subsubsection.1.2.3}%
+\contentsline {subsubsection}{\numberline {1.2.4}Tính tiền, thanh toán và xuất hóa đơn}{7}{subsubsection.1.2.4}%
+\contentsline {subsubsection}{\numberline {1.2.5}Giám sát tồn kho}{7}{subsubsection.1.2.5}%
+\contentsline {subsubsection}{\numberline {1.2.6}Phân tích và báo cáo}{7}{subsubsection.1.2.6}%
+\contentsline {subsubsection}{\numberline {1.2.7}Công cụ quản trị}{8}{subsubsection.1.2.7}%
+\contentsline {subsection}{\numberline {1.3}Tác nhân và tương tác vận hành điển hình}{8}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Yêu cầu chức năng}{9}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}Yêu cầu phi chức năng}{11}{subsection.1.5}%
+\contentsline {subsection}{\numberline {1.6}Ràng buộc và giả định}{11}{subsection.1.6}%
+\contentsline {subsection}{\numberline {1.7}Architecture Characteristics}{12}{subsection.1.7}%
+\contentsline {subsection}{\numberline {1.8}Tiêu chí thành công}{12}{subsection.1.8}%
+\contentsline {section}{\numberline {2}Use Case Scenarios - System Modeling}{14}{section.2}%
+\contentsline {section}{\numberline {3}So sánh và lựa chọn phong cách kiến trúc phù hợp}{38}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Ước tính tải hệ thống}{38}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Modular Monolith}{38}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Microservices}{39}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Event-Driven}{39}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Kết luận lựa chọn: Modular Monolith kết hợp Event-Driven có chọn lọc}{40}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}Ranh giới Modular Monolith}{40}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}Phạm vi áp dụng Event-Driven}{40}{subsubsection.3.5.2}%
+\contentsline {subsubsection}{\numberline {3.5.3}Lý do không chọn Microservices ngay từ đầu}{41}{subsubsection.3.5.3}%
+\contentsline {section}{\numberline {4}Xây dựng kiến trúc phần mềm cho hệ thống}{42}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Module Views}{42}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Context View}{42}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Package View}{44}{subsubsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.3}Module View}{46}{subsubsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.2}Component \& Connector Views}{47}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Component View}{47}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Component \& Connector (C\&C) View}{51}{subsubsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.3}Allocation View}{54}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Install Style}{55}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Deployment Style}{57}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}Work Assignment Style}{58}{subsubsection.4.3.3}%
+\contentsline {section}{\numberline {5}Thiết kế class diagram}{60}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Nghiệp vụ 1: Nhân viên thực hiện chọn món và tạo order}{60}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Nghiệp vụ 2: Quản trị viên thiết lập Catalog (Menu và Khuyến mãi)}{62}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Nghiệp vụ 3: Xử lý nhà bếp và Tự động trừ tồn kho}{64}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Nghiệp vụ 4: Thanh toán hóa đơn và Quản lý trạng thái bàn}{66}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Nghiệp vụ 5: Phân tích dữ liệu và Xuất báo cáo}{68}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Nghiệp vụ 6: Kiểm soát truy cập và Lưu vết hệ thống (Cross-Cutting)}{70}{subsection.5.6}%
