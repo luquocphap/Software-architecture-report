@@ -1,14 +1,69 @@
-\section{So sánh và lựa chọn phong cách kiến trúc phù hợp (Compare and choose suitable architecture styles)}
-Việc chọn architecture style cho IRMS được xem như một bài toán trade-off giữa các \textit{architecture characteristics} (non-functional requirements). IRMS không chỉ có nhiều chức năng (menu, order, kitchen workflow, table/reservation, billing, inventory, reporting) mà còn yêu cầu vận hành trơn chu giữa front-of-house và kitchen, tức là phải giảm delay/error và đồng bộ trạng thái theo thời gian gần realtime. Vì vậy, các tiêu chí như performance, availability/reliability, scalability, maintainability/extensibility và security được ưu tiên khi so sánh các style.
-
-\subsection{Modular Monolith.}
-Theo ma trận đánh giá, Modular Monolith có điểm mạnh lớn nhất ở simplicity và cost thấp. Với bối cảnh đó, cách tiếp cận này giúp nhóm build nhanh, debug dễ và hạn chế overhead vận hành (deploy 1 lần thay vì nhiều service). Tuy nhiên, worksheet cũng chỉ ra monolith bị hạn chế ở scalability, elasticity và fault-tolerance. Đối với IRMS, giờ cao điểm có thể tạo bottleneck ở các luồng như ``place order $\rightarrow$ send to kitchen $\rightarrow$ update status $\rightarrow$ checkout''. Nếu toàn bộ hệ thống chạy chung một khối, khi một module (ví dụ kitchen queue hoặc payment) gặp sự cố hoặc bị quá tải, hiệu ứng lan truyền có thể làm giảm availability của toàn hệ thống. Đây là trade-off quan trọng cần cân nhắc.
-
-\subsection{Microservices.}
-Microservices được đánh giá cao nhất về maintainability, testability, deployability, scalability, fault-tolerance và evolvability. Điều này phù hợp với IRMS vì các module có vòng đời thay đổi khác nhau: menu/promotion thường xuyên update, kitchen workflow cần tối ưu liên tục, billing/payment có tính nhạy cảm và hay phụ thuộc third-party, còn reporting có thể xử lý theo batch. Khi tách thành các component/service độc lập, việc scale và deploy từng phần sẽ chủ động hơn (ví dụ scale riêng kitchen hoặc ordering trong giờ cao điểm), đồng thời việc refactor hoặc nâng cấp cũng ít ảnh hưởng dây chuyền. Trade-off ở đây là chi phí triển khai và vận hành tăng (nhiều service, nhiều API call giữa service, cần cơ chế quan sát/monitoring tốt), tức là overhead sẽ lớn hơn so với monolith.
-
-\subsection{Event-driven.}
-Event-driven architecture được worksheet đánh giá nổi bật ở responsiveness, fault-tolerance và evolvability. Với IRMS, nhiều tình huống tự nhiên đã mang tính sự kiện: OrderPlaced/OrderUpdated, ticket gần deadline, món Done/Ready-to-serve, payment success/fail, low-stock alert, audit log... Nếu các tương tác này được handle bằng event (publish/subscribe) thay vì gọi đồng bộ trực tiếp, các component sẽ giảm coupling, giảm rủi ro chờ đợi khi một service chậm, và dễ mở rộng thêm hành vi (ví dụ thêm module analytics lắng nghe sự kiện để tính SLA) mà không cần sửa code các module hiện có. Trade-off là hệ thống phức tạp hơn ở phần consistency và xử lý lỗi: cần thiết kế idempotency (tránh duplicate event), cơ chế retry/replay khi hệ thống bếp offline, và chấp nhận một mức eventual consistency cho một số trạng thái.
-
-\subsection{Kết luận lựa chọn.}
-Từ các phân tích trên, báo cáo này định hướng lựa chọn kiến trúc theo hướng kết hợp: dùng phân rã theo các ``architecture quantum'' có thể deploy độc lập (phù hợp với microservices) cho các domain chính như Ordering, Kitchen, Billing, Inventory, Reporting; đồng thời các luồng liên module cần realtime và ít coupling (đặc biệt là Ordering $\leftrightarrow$ Kitchen theo UC6--UC9) sẽ được thiết kế theo event-driven để tăng responsiveness và fault-tolerance. Khi thiết kế các component, anti-pattern ``entity trap'' cần được tránh (không tạo các lớp/manager khổng lồ theo từng entity), thay vào đó ranh giới module/component nên bám theo chức năng và workflow thực tế (ví dụ: kitchen ticket workflow + state machine) nhằm giữ cohesion cao và hỗ trợ maintain/extensibility theo yêu cầu của hệ thống.
+\section{So sánh và lựa chọn phong cách kiến trúc phù hợp}
+ 
+Việc chọn architecture style cho IRMS được tiếp cận như một bài toán trade-off giữa các \textit{architecture characteristics} đã xác định ở mục trên. IRMS vừa có nhiều domain chức năng (menu, order, kitchen workflow, table/reservation, billing, inventory, reporting) vừa yêu cầu vận hành trơn chu giữa front-of-house và kitchen theo thời gian gần thực. Do vậy, các tiêu chí performance, availability, data consistency, extensibility và security được ưu tiên khi so sánh các style.
+ 
+\subsection{Ước tính tải hệ thống}
+ 
+Trước khi so sánh các style, nhóm thực hiện ước tính tải để xác định quy mô bài toán. Với nhà hàng $\sim$50 bàn, trung bình 4 khách/bàn, thời gian phục vụ $\sim$90 phút/lượt, trong giờ cao điểm khoảng 30 bàn hoạt động đồng thời. Mỗi bàn phát sinh 5--8 nghiệp vụ request (đặt món, cập nhật trạng thái ticket, thanh toán), tương đương \textbf{150--240 request nghiệp vụ/giờ}. Khi tính thêm các request kỹ thuật (heartbeat, sync, poll), tổng lên khoảng \textbf{800--1.200 request/giờ} trong điều kiện đỉnh tải. Đây là mức tải \textit{vừa phải}, hoàn toàn trong khả năng xử lý của một Modular Monolith được tối ưu tốt, và là cơ sở để đánh giá các style dưới đây.
+ 
+\subsection{Modular Monolith}
+ 
+Modular Monolith có điểm mạnh ở simplicity và chi phí vận hành thấp: build nhanh, debug dễ, deploy một lần thay vì quản lý nhiều service. Tuy nhiên, kiến trúc này bị hạn chế ở scalability và fault-tolerance. Với IRMS, nếu toàn bộ hệ thống chạy chung một khối (không phân tách rõ domain boundary), khi một module (ví dụ kitchen queue hoặc payment) gặp sự cố hoặc quá tải, hiệu ứng lan truyền có thể làm giảm availability của toàn hệ thống. Đây là trade-off quan trọng cần giải quyết ở cấp thiết kế nội bộ.
+ 
+\subsection{Microservices}
+ 
+Microservices được đánh giá cao về maintainability, deployability, scalability, fault-tolerance và evolvability. Điều này phù hợp về mặt lý thuyết với IRMS vì các domain có vòng đời thay đổi khác nhau: menu/promotion thường xuyên update, kitchen workflow cần tối ưu liên tục, billing/payment có tính nhạy cảm cao. Khi tách thành các service độc lập, việc scale từng phần chủ động hơn (scale riêng kitchen hoặc ordering trong giờ cao điểm). Tuy nhiên, với mức tải ước tính 800--1.200 request/giờ, overhead vận hành của microservices (nhiều service, nhiều API call giữa service, cần infrastructure phức tạp cho service discovery và distributed tracing) là không tương xứng với lợi ích thu được ở giai đoạn hiện tại.
+ 
+\subsection{Event-Driven}
+ 
+Event-driven architecture nổi bật ở responsiveness, fault-tolerance và evolvability. Với IRMS, nhiều tình huống tự nhiên đã mang tính sự kiện: \texttt{OrderPlacedEvent}, \texttt{KitchenItemDoneEvent}, \texttt{PaymentCompletedEvent}, \texttt{OrderPaidEvent}, cảnh báo tồn kho thấp, audit log... Nếu các tương tác liên domain này được xử lý bằng event (publish/subscribe) thay vì direct call đồng bộ, các component giảm coupling, giảm rủi ro blocking khi một service chậm, và dễ mở rộng thêm hành vi mà không cần sửa code các module hiện có.
+ 
+Trade-off là hệ thống phức tạp hơn ở tính nhất quán và xử lý lỗi. Cụ thể, không phải mọi domain đều có thể chấp nhận eventual consistency:
+ 
+\begin{table}[h!]
+\centering
+\caption{Phân vùng consistency model theo domain}
+\begin{tabular}{|l|l|p{6.5cm}|l|}
+\hline
+\textbf{Domain} & \textbf{Consistency Model} & \textbf{Lý do} \\
+\hline
+Trạng thái thanh toán & Strong consistency & Sai sót tài chính không thể chấp nhận \\
+\hline
+Trạng thái order (front $\leftrightarrow$ kitchen) & Strong consistency & Lệch thông tin gây sai món \\
+\hline
+Trạng thái bàn & Eventual consistency & Độ trễ 1--2 giây chấp nhận được \\
+\hline
+Tự động trừ kho & Eventual consistency & Xử lý bất đồng bộ, log để xử lý thủ công nếu lỗi \\
+\hline
+Analytics \& báo cáo & Eventual consistency & Xử lý batch, không cần realtime \\
+\hline
+\end{tabular}
+\end{table}
+ 
+\subsection{Kết luận lựa chọn: Modular Monolith kết hợp Event-Driven có chọn lọc}
+ 
+Với bối cảnh nhà hàng quy mô vừa ($\sim$50 bàn, tải đỉnh $\sim$800--1.200 request/giờ), kiến trúc được lựa chọn là \textbf{Modular Monolith kết hợp Event-Driven có chọn lọc}.
+ 
+\subsubsection{Ranh giới Modular Monolith}
+ 
+Hệ thống được tổ chức thành một Modular Monolith với tám domain được phân tách rõ theo boundary: \texttt{order}, \texttt{menu}, \texttt{kitchen}, \texttt{inventory}, \texttt{payment}, \texttt{promotion}, \texttt{seating}, \texttt{report}. Mỗi domain tuân theo cấu trúc lớp nhất quán (controller / service interface / service impl / repository / entity / dto / event / listener) và không được phép gọi trực tiếp vào implementation của domain khác. Giao tiếp nội domain đi qua service interface; giao tiếp cross-domain đi qua Facade Layer hoặc Event Bus.
+ 
+Facade Layer (\texttt{orchestration/}) đóng vai trò điều phối các use case yêu cầu nhiều domain: \texttt{OrderingFacade} (validate món + kho $\rightarrow$ tạo order), \texttt{AdminCatalogFacade} (kiểm tra ràng buộc $\rightarrow$ thay đổi menu/promo), \texttt{CheckoutFacade} (tính bill với discount + thuế), \texttt{ReportingDataFacade} (tổng hợp dữ liệu từ nhiều domain cho báo cáo).
+ 
+\subsubsection{Phạm vi áp dụng Event-Driven}
+ 
+Event-Driven được áp dụng có chọn lọc cho các workflow liên domain và realtime, nơi mà việc gọi đồng bộ trực tiếp sẽ tạo ra coupling không cần thiết:
+ 
+\begin{itemize}
+  \item \texttt{OrderPlacedEvent}: Order domain $\rightarrow$ Kitchen domain (tạo ticket cho từng \texttt{OrderItem})
+  \item \texttt{KitchenItemDoneEvent}: Kitchen domain $\rightarrow$ Inventory domain (tự động trừ kho theo công thức, chạy \texttt{@Async})
+  \item \texttt{PaymentCompletedEvent}: Payment domain $\rightarrow$ Order domain (\texttt{markAsPaid()}) và Seating domain (\texttt{clearTable()})
+  \item \texttt{OrderPaidEvent}: Order domain $\rightarrow$ Seating domain (bàn chuyển sang \texttt{DIRTY})
+\end{itemize}
+ 
+Các luồng yêu cầu strong consistency (tính tiền, validate kho trước khi đặt món) vẫn sử dụng direct synchronous call qua Facade để đảm bảo tính toàn vẹn dữ liệu.
+ 
+\subsubsection{Lý do không chọn Microservices ngay từ đầu}
+ 
+Việc triển khai Microservices ở giai đoạn hiện tại sẽ tạo ra độ phức tạp vận hành không tương xứng: cần infrastructure cho service discovery, distributed tracing, saga pattern cho distributed transaction, và tăng đáng kể số lượng network hop. Với mức tải hiện tại ($\sim$200 order/giờ nghiệp vụ), lợi ích của Microservices chưa đủ bù đắp overhead này.
+ 
