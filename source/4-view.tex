@@ -128,101 +128,340 @@ Sơ đồ Module View giúp mô tả rõ ràng cấu trúc nghiệp vụ của h
 
 
 \subsection{Component \& Connector Views}
-\subsubsection{Component View}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{image/4.2.2.png}
-    \caption{Component View của hệ thống}
-    \label{fig:component-view}
+    \includegraphics[width=0.85\linewidth]{image/4.2.3.png}
+    \caption{Component View}
+    \label{fig:component-all}
 \end{figure}
 
-Sơ đồ Component View mô tả cấu trúc thành phần bên trong hệ thống và cách các component được tổ chức theo mô hình phân lớp nhằm tăng khả năng mở rộng, tái sử dụng và bảo trì hệ thống.
+Sau khi hoàn thiện kiến trúc hệ thống, Component \& Connector View được tách thành nhiều sơ đồ nhỏ nhằm giúp mô tả rõ ràng hơn từng khía cạnh kỹ thuật của hệ thống thay vì gom toàn bộ thành phần vào một sơ đồ lớn duy nhất.
 
-Khác với Module View chỉ tập trung vào các business module ở mức khái quát, Component View đi sâu hơn vào các thành phần kỹ thuật cụ thể và trách nhiệm của từng component trong hệ thống.
+Cách tổ chức này giúp:
+\begin{itemize}
+    \item Giảm độ phức tạp của sơ đồ tổng thể.
+    \item Giúp người đọc dễ theo dõi từng nhóm chức năng.
+    \item Phân tách rõ business flow, persistence, event-driven communication và infrastructure.
+    \item Tăng khả năng bảo trì và mở rộng tài liệu kiến trúc.
+\end{itemize}
 
-Hệ thống được chia thành các layer chính như sau:
+Các sơ đồ Component View được chia thành bốn nhóm chính gồm:
+\begin{itemize}
+    \item Core Business Flow Component View
+    \item Event-Driven Component View
+    \item Persistence Component View
+    \item Infrastructure / Technical Component View
+\end{itemize}
 
-\textbf{Presentation Layer}:  
-Bao gồm các controller như:
-\textit{AuthController, OrderController, MenuController, PaymentController, ReportController}.  
-Các controller đóng vai trò là điểm tiếp nhận HTTP request từ client và chuyển tiếp request tới các lớp xử lý nghiệp vụ tương ứng.
+% =========================================================
+% CORE BUSINESS FLOW
+% =========================================================
 
-\textbf{Application / Orchestration Layer}:  
-Bao gồm các facade như:
-\textit{OrderingFacade, CheckoutFacade, ReportingFacade}.  
-Lớp này chịu trách nhiệm điều phối các luồng nghiệp vụ phức tạp giữa nhiều domain service khác nhau, giúp giảm coupling giữa Presentation Layer và Domain Layer.
+\subsubsection{Core Business Flow Component View}
 
-\textbf{Domain Services Layer}:  
-Chứa các service nghiệp vụ chính của hệ thống bao gồm:
-\textit{OrderService, MenuService, KitchenService, PaymentService, InventoryService, ReportService}.  
-Đây là lớp xử lý business logic cốt lõi của hệ thống.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image/4.2.4.png}
+    \caption{Core Business Flow Component View}
+    \label{fig:core-business-flow}
+\end{figure}
 
-\textbf{Persistence Layer}:  
-Bao gồm các repository chịu trách nhiệm truy cập và lưu trữ dữ liệu thông qua JPA/Hibernate.
+\subsubsection*{Mô tả}
 
-\textbf{Infrastructure Layer}:  
-Bao gồm các thành phần hạ tầng như:
-\textit{EventBus} và \textit{JWT Security}.  
-Lớp này hỗ trợ xác thực người dùng và giao tiếp bất đồng bộ thông qua cơ chế event-driven.
+Sơ đồ Core Business Flow Component View mô tả luồng xử lý nghiệp vụ chính của hệ thống từ tầng controller cho tới service, repository và facade orchestration.
 
-\textbf{Database}:  
-Hệ thống sử dụng PostgreSQL làm cơ sở dữ liệu trung tâm để lưu trữ toàn bộ dữ liệu nghiệp vụ.
+Mục tiêu của sơ đồ này là thể hiện:
+\begin{itemize}
+    \item Các feature chính của hệ thống.
+    \item Quan hệ giữa controller, service và repository.
+    \item Vai trò của facade trong các workflow phức tạp.
+    \item Luồng xử lý chính giữa các business component.
+\end{itemize}
 
-\subsubsection*{Luồng hoạt động của Component View}
+Hệ thống được tổ chức theo từng feature riêng biệt như:
+\textit{Order Feature, Menu Feature, Payment Feature, Kitchen Feature, Inventory Feature, Promotion Feature} và \textit{Reporting Feature}.
 
-Quá trình xử lý request trong hệ thống diễn ra theo các bước sau:
+Mỗi feature bao gồm:
+\begin{itemize}
+    \item Controller tiếp nhận HTTP request.
+    \item Service xử lý business logic.
+    \item Repository thao tác với dữ liệu.
+\end{itemize}
+
+Ngoài ra, hệ thống còn sử dụng:
+\begin{itemize}
+    \item \textbf{JWT Security} để xác thực request.
+    \item \textbf{Facade Layer} để orchestration giữa nhiều service khi xử lý workflow phức tạp.
+    \item \textbf{EventBus} để hỗ trợ giao tiếp bất đồng bộ.
+\end{itemize}
+
+\subsubsection*{Luồng hoạt động}
+
+Quá trình xử lý nghiệp vụ chính diễn ra theo các bước:
 
 \begin{enumerate}
-    \item Client gửi HTTP request tới hệ thống.
+    \item Client gửi request tới hệ thống.
     
-    \item JWT Security thực hiện xác thực và phân quyền request trước khi chuyển tiếp tới controller tương ứng.
+    \item JWT Security thực hiện xác thực và phân quyền.
     
-    \item Controller tiếp nhận request:
-    \begin{itemize}
-        \item Với các tác vụ đơn giản, controller có thể gọi trực tiếp service.
-        \item Với các workflow phức tạp, controller sẽ gọi tới facade để điều phối nghiệp vụ.
-    \end{itemize}
+    \item Controller tiếp nhận request.
     
-    \item Facade thực hiện orchestration giữa nhiều domain service khác nhau nhằm xử lý business logic.
+    \item Với các tác vụ đơn giản, controller gọi trực tiếp service tương ứng.
     
-    \item Domain service thao tác với repository để truy cập hoặc cập nhật dữ liệu trong PostgreSQL.
+    \item Với các workflow phức tạp, controller sẽ gọi facade để orchestration giữa nhiều service.
     
-    \item Trong quá trình xử lý, service có thể publish domain events tới EventBus.
+    \item Service xử lý business logic và thao tác với repository.
     
-    \item EventBus thực hiện dispatch event bất đồng bộ tới các listener hoặc service khác nhằm xử lý các tác vụ follow-up.
+    \item Repository truy cập dữ liệu trong PostgreSQL.
+    
+    \item Một số service có thể publish event tới EventBus để kích hoạt các tác vụ bất đồng bộ.
 \end{enumerate}
 
-\subsubsection*{Guideline cho Component View}
+\subsubsection*{Guideline}
 
-Khi xây dựng Component View cho hệ thống, cần tuân thủ các nguyên tắc sau:
+Khi xây dựng Core Business Flow Component View cần tuân thủ các nguyên tắc sau:
 
 \begin{itemize}
-    \item Component View phải tập trung mô tả cấu trúc thành phần bên trong hệ thống thay vì business capability ở mức cao.
+    \item Tập trung mô tả luồng nghiệp vụ chính của hệ thống.
     
-    \item Các component nên được tổ chức theo layer nhằm tăng tính phân tách trách nhiệm (Separation of Concerns).
+    \item Mỗi feature nên được tách biệt rõ ràng nhằm tăng modularity.
     
-    \item Controller cần giữ vai trò ``thin controller'', chỉ tiếp nhận request và chuyển tiếp xử lý xuống các layer bên dưới.
+    \item Controller cần giữ vai trò ``thin controller''.
     
-    \item Các workflow nghiệp vụ phức tạp nên được xử lý thông qua facade hoặc orchestration layer để tránh coupling trực tiếp giữa controller và nhiều service.
+    \item Business logic phải nằm trong service layer.
     
-    \item Business logic phải được đặt tại domain services thay vì controller hoặc repository.
+    \item Repository chỉ thực hiện persistence.
     
-    \item Repository chỉ chịu trách nhiệm persistence và không chứa business logic.
+    \item Các workflow phức tạp nên sử dụng facade để orchestration.
     
-    \item Các thành phần cross-cutting như authentication, event bus hoặc logging nên được tách riêng vào infrastructure layer.
+    \item Không đưa implementation detail ở mức method hoặc entity field vào sơ đồ.
     
-    \item Các interaction bất đồng bộ nên được biểu diễn thông qua event-driven connectors như EventBus.
+    \item Luồng xử lý chính cần dễ đọc và dễ theo dõi.
+\end{itemize}
+
+% =========================================================
+% EVENT DRIVEN
+% =========================================================
+
+\subsubsection{Event-Driven Component View}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{image/4.2.5.png}
+    \caption{Event-Driven Component View}
+    \label{fig:event-driven-view}
+\end{figure}
+
+\subsubsection*{Mô tả}
+
+Sơ đồ Event-Driven Component View mô tả cơ chế giao tiếp bất đồng bộ giữa các feature thông qua EventBus và các event listener.
+
+Kiến trúc event-driven giúp:
+\begin{itemize}
+    \item Giảm coupling giữa các module.
+    \item Tăng khả năng mở rộng hệ thống.
+    \item Hỗ trợ asynchronous processing.
+    \item Cho phép nhiều feature phản ứng với cùng một domain event.
+\end{itemize}
+
+Các service như:
+\textit{OrderService, PaymentService, KitchenService, InventoryService} và \textit{SeatingService}
+có khả năng publish domain events tới EventBus.
+
+Các listener sẽ subscribe các event tương ứng để xử lý follow-up actions.
+
+\subsubsection*{Luồng hoạt động}
+
+Ví dụ luồng xử lý event-driven:
+
+\begin{enumerate}
+    \item OrderService publish sự kiện \textit{OrderCreated}.
     
-    \item Không nên đưa quá nhiều implementation detail vào Component View như entity fields hoặc method-level design vì điều này phù hợp hơn với Class Diagram.
+    \item EventBus dispatch event tới các listener liên quan.
     
-    \item Component View cần đảm bảo người đọc có thể nhanh chóng hiểu:
+    \item KitchenListener nhận event và gửi ticket xuống bếp.
+    
+    \item InventoryListener nhận event và tự động trừ nguyên liệu.
+    
+    \item Sau khi thanh toán thành công, PaymentService publish event \textit{PaymentProcessed}.
+    
+    \item SeatingListener nhận event và cập nhật trạng thái bàn.
+\end{enumerate}
+
+\subsubsection*{Guideline}
+
+Khi xây dựng Event-Driven Component View cần tuân thủ các nguyên tắc sau:
+
+\begin{itemize}
+    \item Chỉ mô tả các interaction bất đồng bộ.
+    
+    \item Event cần được đặt tên rõ ràng theo domain event.
+    
+    \item Listener nên xử lý tác vụ độc lập và không phụ thuộc trực tiếp vào publisher.
+    
+    \item Không tạo dependency trực tiếp giữa các feature thông qua method call nếu có thể dùng event.
+    
+    \item EventBus cần đóng vai trò trung gian giao tiếp.
+    
+    \item Tránh đưa logic xử lý chi tiết của listener vào sơ đồ.
+    
+    \item Các asynchronous flow cần dễ dàng nhận biết.
+\end{itemize}
+
+% =========================================================
+% PERSISTENCE
+% =========================================================
+
+\subsubsection{Persistence Component View}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{image/4.2.6.png}
+    \caption{Persistence Component View}
+    \label{fig:persistence-view}
+\end{figure}
+
+\subsubsection*{Mô tả}
+
+Sơ đồ Persistence Component View mô tả cách các service tương tác với repository và cơ sở dữ liệu PostgreSQL.
+
+Mục tiêu của sơ đồ này là:
+\begin{itemize}
+    \item Thể hiện kiến trúc persistence layer.
+    \item Mô tả dependency giữa service và repository.
+    \item Minh họa cách dữ liệu được lưu trữ trong hệ thống.
+\end{itemize}
+
+Mỗi feature đều có repository riêng nhằm đảm bảo:
+\begin{itemize}
+    \item Tính độc lập giữa các domain.
+    \item Separation of Concerns.
+    \item Dễ mở rộng và bảo trì.
+\end{itemize}
+
+Tất cả repository đều kết nối tới PostgreSQL thông qua JPA/Hibernate.
+
+\subsubsection*{Luồng hoạt động}
+
+Quá trình persistence diễn ra như sau:
+
+\begin{enumerate}
+    \item Service xử lý business logic.
+    
+    \item Service gọi repository tương ứng để thao tác dữ liệu.
+    
+    \item Repository thực hiện CRUD operation thông qua ORM framework.
+    
+    \item Dữ liệu được lưu trữ hoặc truy xuất từ PostgreSQL.
+\end{enumerate}
+
+\subsubsection*{Guideline}
+
+Khi xây dựng Persistence Component View cần tuân thủ các nguyên tắc sau:
+
+\begin{itemize}
+    \item Repository chỉ chịu trách nhiệm persistence.
+    
+    \item Không đặt business logic trong repository.
+    
+    \item Mỗi domain nên có repository riêng.
+    
+    \item Các dependency giữa service và database phải đi qua repository layer.
+    
+    \item Không để controller truy cập trực tiếp database.
+    
+    \item Persistence layer cần được tách biệt khỏi presentation layer.
+    
+    \item Chỉ mô tả dependency persistence ở mức component.
+\end{itemize}
+
+% =========================================================
+% INFRASTRUCTURE
+% =========================================================
+
+\subsubsection{Infrastructure / Technical Component View}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{image/4.2.7.png}
+    \caption{Infrastructure / Technical Component View}
+    \label{fig:infrastructure-view}
+\end{figure}
+
+\subsubsection*{Mô tả}
+
+Sơ đồ Infrastructure / Technical Component View mô tả các thành phần kỹ thuật và cross-cutting concerns hỗ trợ cho toàn bộ hệ thống.
+
+Các thành phần này không chứa business logic nhưng đóng vai trò quan trọng trong việc vận hành hệ thống.
+
+Sơ đồ bao gồm các nhóm thành phần chính:
+
+\begin{itemize}
+    \item \textbf{Security Infrastructure}
     \begin{itemize}
-        \item Hệ thống gồm những component nào.
-        \item Vai trò của từng component.
-        \item Quan hệ phụ thuộc giữa các component.
-        \item Luồng xử lý chính của hệ thống.
+        \item JWT Security
+        \item SecurityConfig
+        \item CorsConfig
     \end{itemize}
+    
+    \item \textbf{Persistence Configuration}
+    \begin{itemize}
+        \item JpaConfig
+        \item PostgreSQL
+    \end{itemize}
+    
+    \item \textbf{Async Infrastructure}
+    \begin{itemize}
+        \item AsyncConfig
+        \item EventBus
+    \end{itemize}
+    
+    \item \textbf{API Infrastructure}
+    \begin{itemize}
+        \item ExceptionHandler
+        \item JacksonConfig
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Luồng hoạt động}
+
+Các technical component hỗ trợ hệ thống như sau:
+
+\begin{enumerate}
+    \item SecurityConfig cấu hình JWT authentication và authorization.
+    
+    \item CorsConfig quản lý CORS policy cho API.
+    
+    \item JpaConfig cấu hình kết nối cơ sở dữ liệu.
+    
+    \item AsyncConfig cấu hình cơ chế asynchronous processing cho EventBus.
+    
+    \item ExceptionHandler xử lý lỗi tập trung cho toàn bộ API.
+    
+    \item JacksonConfig hỗ trợ serialization/deserialization dữ liệu JSON.
+\end{enumerate}
+
+\subsubsection*{Guideline}
+
+Khi xây dựng Infrastructure / Technical Component View cần tuân thủ các nguyên tắc sau:
+
+\begin{itemize}
+    \item Chỉ mô tả các technical component mang tính cross-cutting.
+    
+    \item Infrastructure layer cần độc lập với business domain.
+    
+    \item Các component cấu hình nên được gom theo nhóm chức năng.
+    
+    \item Security concern cần được tách riêng khỏi business logic.
+    
+    \item Các asynchronous infrastructure nên được biểu diễn rõ ràng.
+    
+    \item Exception handling nên được centralized.
+    
+    \item Không đưa business workflow vào sơ đồ infrastructure.
+    
+    \item Sơ đồ cần giúp người đọc hiểu được các thành phần kỹ thuật hỗ trợ toàn hệ thống.
 \end{itemize}
 
 \subsubsection{Component \& Connector (C\&C) View}
